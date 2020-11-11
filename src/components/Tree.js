@@ -97,6 +97,15 @@ export default class Tree extends Component {
 
     onNodeSelect = (node) => {
         const { nodes } = this.state;
+        let activeNode = values(nodes).filter(node => node.active === true);
+        if(activeNode[0]){
+            if(activeNode[0] === nodes[node.name]){
+                nodes[node.name].active = false;
+                this.setState({ nodes });
+                return null;
+            }
+            activeNode[0].active = false;
+        }
         if (nodes[node.name].active){
             nodes[node.name].active = false;
         }else{
@@ -136,9 +145,6 @@ export default class Tree extends Component {
             nodes[this.getLastId()] = node;
             this.setState({ nodes });
             }
-        }else if(activeNode.length > 1){
-            alert('You can not add a node to 2 or more nodes at the same time.');
-            return null;
         }else{
             node.name = this.getLastId();
             activeNode[0].children[activeNode[0].children.length] = node.name;
@@ -153,11 +159,7 @@ export default class Tree extends Component {
         let newPath = undefined;
         const { nodes } = this.state;
         let activeNode = this.findActiveNode();
-        if (activeNode.length > 1) {
-            alert('You can not edit 2 or more nodes at the same time.')
-            return null; 
-        }else if(activeNode.length === 0){
-            alert('Please, select a node to edit.')
+        if(activeNode.length === 0){
             return null;
         }   
         newPath = activeNode[0].path.split('/')
@@ -193,10 +195,7 @@ export default class Tree extends Component {
         let potentialParentNodePath;
         let parentNode;
         let indexOfChildInChildrenArray;
-        if (activeNode.length > 1) {
-            alert('You can not delete 2 or more selected nodes at the same time.')
-            return null;
-        }else if(activeNode.length === 0){
+        if(activeNode.length === 0){
             alert('Please, select a node to delete.')
             return null;
         }
@@ -210,7 +209,7 @@ export default class Tree extends Component {
         }
         parentNode = values(nodes).filter(node => node.path === parentNodePath);
         if(parentNode.length > 1){
-            alert('You have two or more identical nodes paths, please, edit them.') // Была ошибка при создании одинаковых узлов, оставил, код ведь не идеален,
+            alert('You have two or more identical node paths, please, edit them.') // Была ошибка при создании одинаковых узлов, оставил, код ведь не идеален,
             return null;                                                            // может в каком-нибудь сценарии повторится.
         }
         indexOfChildInChildrenArray = nodes[parentNode[0].name].children.indexOf(activeNode[0].name)
@@ -248,6 +247,7 @@ export default class Tree extends Component {
                 onEditNode={this.onEditNode}
                 onDeleteNode={this.onDeleteNode}
                 onClearTree={this.onClearTree}
+                findActiveNode={this.findActiveNode}
                  />
             </StyledDiv>
         )
